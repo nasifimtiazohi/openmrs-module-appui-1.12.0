@@ -189,11 +189,7 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>2.4</version>
                 </plugin>
-                <!-- The 2.10 version of this plugin released in Sept 2014 leads to opaque errors and a lot of:
-                 [ERROR] java.lang.ClassCastException: com.sun.tools.javadoc.ClassDocImpl cannot be cast to com.sun.javadoc.AnnotationTypeDoc
-                 We manually override to use the prior version which works fine.
-                 See: http://jira.codehaus.org/browse/MJAVADOC-408
-                 -->
+                
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
@@ -217,7 +213,7 @@
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <tagNameFormat>@{project.version}</tagNameFormat>
-                        <!-- refapp distro contains SNAPSHOT dependencies -->
+                        
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                     </configuration>
                 </plugin>
@@ -265,4 +261,63 @@
         </snapshotRepository>
     </distributionManagement>
 
-</project>
+<profiles>
+	<profile>
+        <id>vulas</id>
+        <activation>
+            <property>
+                <name>vulas</name>
+            </property>
+        </activation>
+        <properties>
+            <vulas.version>3.1.10-SNAPSHOT</vulas.version>
+            <vulas.shared.backend.serviceUrl>http://localhost:8033/backend/</vulas.shared.backend.serviceUrl>
+            <vulas.core.space.token>9237B647D37B9176837CB401EE2922F6</vulas.core.space.token>
+            <vulas.core.appContext.group>${project.groupId}</vulas.core.appContext.group>
+            <vulas.core.appContext.artifact>${project.artifactId}</vulas.core.appContext.artifact>
+            <vulas.core.appContext.version>${project.version}</vulas.core.appContext.version>
+        </properties>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>com.sap.research.security.vulas</groupId>
+                    <artifactId>plugin-maven</artifactId>
+                    <version>${vulas.version}</version>
+                    <configuration>
+                        <layeredConfiguration>
+                            <vulas.shared.backend.serviceUrl>${vulas.shared.backend.serviceUrl}</vulas.shared.backend.serviceUrl>
+                            <vulas.core.space.token>${vulas.core.space.token}</vulas.core.space.token>
+
+                            <vulas.core.appContext.group>${vulas.core.appContext.group}</vulas.core.appContext.group>
+                            <vulas.core.appContext.artifact>${vulas.core.appContext.artifact}</vulas.core.appContext.artifact>
+                            <vulas.core.appContext.version>${vulas.core.appContext.version}</vulas.core.appContext.version>
+
+                            <vulas.shared.tmpDir>${project.build.directory}/vulas/tmp</vulas.shared.tmpDir>
+                            <vulas.core.uploadDir>${project.build.directory}/vulas/upload</vulas.core.uploadDir>
+                            <vulas.core.app.sourceDir>${project.build.directory}/classes,${project.basedir}/src/main/java,${project.basedir}/src/main/python</vulas.core.app.sourceDir>
+
+                            
+                            <vulas.core.instr.sourceDir>${project.build.directory}</vulas.core.instr.sourceDir>
+                            <vulas.core.instr.targetDir>${project.build.directory}/vulas/target</vulas.core.instr.targetDir>
+                            <vulas.core.instr.includeDir>${project.build.directory}/vulas/include</vulas.core.instr.includeDir>
+                            <vulas.core.instr.libDir>${project.build.directory}/vulas/lib</vulas.core.instr.libDir>
+                            <vulas.core.instr.writeCode>false</vulas.core.instr.writeCode>
+                            <vulas.core.instr.instrumentorsChoosen>com.sap.psr.vulas.monitor.trace.SingleTraceInstrumentor</vulas.core.instr.instrumentorsChoosen>
+                            <vulas.core.instr.searchRecursive>false</vulas.core.instr.searchRecursive>
+                            <vulas.core.monitor.periodicUpload.enabled>false</vulas.core.monitor.periodicUpload.enabled>
+                            <vulas.core.instr.maxStacktraces>10</vulas.core.instr.maxStacktraces>
+
+                            
+                            <vulas.reach.wala.callgraph.reflection>NO_FLOW_TO_CASTS_NO_METHOD_INVOKE</vulas.reach.wala.callgraph.reflection>
+                            <vulas.reach.timeout>60</vulas.reach.timeout>
+
+                            
+                            <vulas.report.exceptionExcludeBugs />
+                            <vulas.report.reportDir>${project.build.directory}/vulas/report</vulas.report.reportDir>
+                        </layeredConfiguration>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+    </profiles></project>
